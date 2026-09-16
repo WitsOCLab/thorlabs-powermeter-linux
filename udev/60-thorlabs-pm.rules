@@ -1,0 +1,8 @@
+# Thorlabs power meters (PM100x, PM16x, PM160, PM400; USB vendor 0x1313).
+# Raw USB node (pyvisa-py/libusb) and the kernel usbtmc node, plus a stable
+# symlink /dev/thorlabs-pm/<serial> so code never guesses usbtmcN.
+SUBSYSTEM=="usb", ATTR{idVendor}=="1313", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usbmisc", KERNEL=="usbtmc*", ATTRS{idVendor}=="1313", MODE="0660", GROUP="plugdev", SYMLINK+="thorlabs-pm/%s{serial}"
+
+# Keep the meter awake: USB autosuspend causes timeouts after idle.
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1313", TEST=="power/control", ATTR{power/control}="on"

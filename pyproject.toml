@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thorlabs-powermeter-linux"
+version = "0.1.0"
+description = "Thorlabs PM16 / PM160 / PM100 power meters on Linux through the kernel usbtmc driver: no VISA, no Windows-only Optical Power Monitor"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+keywords = ["Thorlabs", "power meter", "PM100", "PM16", "PM160", "PM400", "usbtmc", "SCPI", "optical power", "photodiode", "Linux"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Intended Audience :: Science/Research",
+]
+dependencies = ["numpy>=1.24"]
+
+[project.scripts]
+thorlabs-pm = "thorlabs_pm.cli:main"
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

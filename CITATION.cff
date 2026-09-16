@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: thorlabs-powermeter-linux
+message: If you use this software, please cite it.
+type: software
+authors:
+  - name: OCLab, School of Electrical and Information Engineering, University of the Witwatersrand
+repository-code: https://github.com/WitsOCLab/thorlabs-powermeter-linux
+license: MIT
