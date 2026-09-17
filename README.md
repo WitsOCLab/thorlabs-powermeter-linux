@@ -18,7 +18,7 @@ If you use this in published work, please cite the repository (see CITATION.cff)
 ```
 sudo cp udev/60-thorlabs-pm.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules
 sudo usermod -aG plugdev $USER        # log out and in once
-pip install thorlabs-powermeter-linux
+pip install thorlabs-powermeter-linux                # or, before the PyPI release: pip install git+https://github.com/WitsOCLab/thorlabs-powermeter-linux
 thorlabs-pm list
 ```
 

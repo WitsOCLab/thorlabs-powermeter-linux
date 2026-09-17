@@ -1,0 +1,21 @@
+name: publish
+# Pushing a tag like v0.1.0 builds the package and uploads it to PyPI with trusted publishing:
+# no API token anywhere. PyPI must know this repository and workflow (Publishing -> add a
+# pending publisher: owner WitsOCLab, this repository, workflow publish.yml, environment pypi).
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
