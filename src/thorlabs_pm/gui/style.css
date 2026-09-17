@@ -1,0 +1,192 @@
+/* OCLab instrument styling.
+ *
+ * Low brightness and very little colour on purpose: the rig is run in the dark, often through
+ * laser safety glasses, which is the reason Thorlabs give for the look of their own power meter
+ * software. Colour is kept for state that matters (good / warn / bad) and for one accent, the
+ * blue of the School of Electrical and Information Engineering mark the modulators display
+ * (#1060b0, lifted to #3f8fd8 so it reads on a dark ground).
+ *
+ * Readings are Fira Mono with tabular figures, so a changing number does not shuffle sideways.
+ * GTK CSS has no custom properties and no :root, hence @define-color.
+ */
+
+@define-color ocl_bg     #13161b;
+@define-color ocl_panel  #1a1e25;
+@define-color ocl_raised #0f1216;
+@define-color ocl_line   #2a313b;
+@define-color ocl_text   #e6e9ee;
+@define-color ocl_dim    #98a2b0;
+@define-color ocl_faint  #6b7583;
+@define-color ocl_accent #3f8fd8;
+@define-color ocl_ok     #56b870;
+@define-color ocl_warn   #d6a235;
+@define-color ocl_bad    #e0645c;
+
+window.instrument {
+  background-color: @ocl_bg;
+  color: @ocl_text;
+  font-family: "Fira Sans", Cantarell, sans-serif;
+}
+
+window.instrument headerbar {
+  background-color: @ocl_raised;
+  border-bottom: 1px solid @ocl_line;
+  box-shadow: none;
+}
+
+/* ---- panels: the boxed regions instrument software divides itself into ---------------- */
+
+.panel {
+  background-color: @ocl_panel;
+  border: 1px solid @ocl_line;
+  border-radius: 6px;
+  padding: 10px;          /* without this the content sits hard against the border */
+}
+
+.panel-flat {
+  background-color: @ocl_panel;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+/* a small letter-spaced caption over a group of controls, as on the Thorlabs settings column */
+.panel-title {
+  font-size: 0.78em;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: @ocl_dim;
+}
+
+.field-label {
+  font-size: 0.84em;
+  color: @ocl_dim;
+}
+
+.toolbar-strip {
+  background-color: #151920;
+  border-bottom: 1px solid @ocl_line;
+}
+
+/* ---- the reading itself ---------------------------------------------------------------- */
+
+.readout-quantity {
+  font-size: 1.15em;
+  font-weight: bold;
+  color: @ocl_text;
+}
+
+.readout-value {
+  font-family: "Fira Mono", "DejaVu Sans Mono", monospace;
+  font-feature-settings: "tnum";
+  color: #f2f5f9;
+}
+
+.readout-unit {
+  font-size: 1.5em;
+  color: @ocl_dim;
+  font-weight: bold;
+}
+
+/* Max / Min / mean tiles under the reading, as in the OPM numeric and statistics panels */
+.tile {
+  background-color: @ocl_raised;
+  border: 1px solid @ocl_line;
+  border-radius: 5px;
+  padding: 6px 10px;
+}
+
+.tile-label {
+  font-size: 0.75em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: @ocl_faint;
+}
+
+.tile-value {
+  font-family: "Fira Mono", "DejaVu Sans Mono", monospace;
+  font-feature-settings: "tnum";
+  font-size: 1.15em;
+  color: @ocl_text;
+}
+
+.tile-unit {
+  font-size: 0.8em;
+  color: @ocl_dim;
+}
+
+/* ---- the status strip every one of these tools has along the bottom -------------------- */
+
+.statusbar {
+  background-color: @ocl_raised;
+  border-top: 1px solid @ocl_line;
+  font-size: 0.82em;
+  color: @ocl_dim;
+}
+
+.mono {
+  font-family: "Fira Mono", "DejaVu Sans Mono", monospace;
+  font-feature-settings: "tnum";
+}
+
+.chip {
+  background-color: @ocl_raised;
+  border: 1px solid @ocl_line;
+  border-radius: 12px;
+  padding: 1px 10px;
+  font-size: 0.82em;
+  color: @ocl_dim;
+}
+
+.live-badge {
+  background-color: @ocl_bad;
+  color: #ffffff;
+  border-radius: 3px;
+  padding: 0px 6px;
+  font-size: 0.72em;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.dot-ok   { color: @ocl_ok; }
+.dot-warn { color: @ocl_warn; }
+.dot-bad  { color: @ocl_bad; }
+.dot-idle { color: @ocl_faint; }
+
+.value-ok   { color: @ocl_ok; }
+.value-warn { color: @ocl_warn; }
+.value-bad  { color: @ocl_bad; }
+
+.hint {
+  font-size: 0.84em;
+  color: @ocl_faint;
+}
+
+textview.mono text {
+  font-family: "Fira Mono", "DejaVu Sans Mono", monospace;
+  background-color: @ocl_raised;
+  color: #cbd3de;
+}
+
+/* Adwaita's level bar goes bright green at full scale, which shouts in a dark lab and means
+   nothing here: the bar is only "how big is this reading against the recent peak". */
+window.instrument levelbar trough {
+  background-color: @ocl_raised;
+  border: 1px solid @ocl_line;
+  border-radius: 3px;
+  min-height: 5px;
+}
+
+window.instrument levelbar block.filled,
+window.instrument levelbar block.full,
+window.instrument levelbar block.high,
+window.instrument levelbar block.low {
+  background-color: @ocl_accent;
+  border-color: @ocl_accent;
+  border-radius: 3px;
+}
+
+window.instrument levelbar block.empty {
+  background-color: transparent;
+  border-color: transparent;
+}

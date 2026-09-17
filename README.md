@@ -1,42 +1,87 @@
 # thorlabs-powermeter-linux
 
-Thorlabs PM16, PM160, PM100 and PM400-family optical power meters on Linux, through the kernel's
-own `usbtmc` driver. No VISA, no National Instruments runtime, no vendor DLL.
+Thorlabs PM16, PM160, PM100 and PM400 optical power meters on Linux, using the kernel's usbtmc driver. No VISA, no vendor DLL. Comes with a command line tool and a desktop app that does what Thorlabs' Optical Power Monitor does on Windows.
+
+![the window](docs/window.png)
+
+## Creator
+
+**Warwick Brown**  
+_School of Electrical and Information Engineering, University of the Witwatersrand, Johannesburg, South Africa_  
+Email: [warwickb10@gmail.com](mailto:warwickb10@gmail.com)  
+Homepage: [https://www.wits.ac.za/oclab](https://www.wits.ac.za/oclab)
+
+If you use this in published work, please cite the repository (see CITATION.cff) or acknowledge the Wits OC Lab. Pull requests are welcome.
+
+## Install
 
 ```
+sudo cp udev/60-thorlabs-pm.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules
+sudo usermod -aG plugdev $USER        # log out and in once
 pip install thorlabs-powermeter-linux
-thorlabs-pm watch --wavelength-nm 532
+thorlabs-pm list
 ```
+
+For the app (GTK 4 comes from the distribution, so the environment must see system packages):
+
+```
+sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1
+pipx install --system-site-packages thorlabs-powermeter-linux
+thorlabs-pm desktop-install            # puts "Power Meter" in the application menu
+```
+
+Tested on Pop!_OS and Ubuntu 22.04 and 24.04. The app needs libadwaita 1.5 (24.04 or newer); the library and command line do not.
+
+## From Python
+
 ```python
 from thorlabs_pm import PowerMeter
+
+with PowerMeter(wavelength_nm=532) as pm:
+    r = pm.read(n=10)                 # {'watts', 'std_watts', 'wavelength_nm', 'dbm', 'n'}
+    print(r["watts"], "W")
+    pm.configure(auto_range=True)
+    pm.zero()                         # store the present reading as the dark level
+    print(pm.describe())              # identity, sensor head, calibration date, responsivity
 ```
 
-## The problem it solves
+`PowerMeter(serial="18090634")` picks one meter when several are plugged in. `SimPowerMeter` has the same interface and no hardware, for tests.
 
-Thorlabs' Optical Power Monitor and the TLPM library are Windows-only. The meters themselves
-are ordinary USBTMC instruments speaking SCPI, so on Linux the kernel driver is all that is
-needed — but the details (a udev rule for the device node, a stable name per serial number,
-timeouts, unsticking a stalled pipe, checking `SYST:ERR?` after every command, and the meter's
-own zero / relative / range modes) are what every lab rediscovers. This is that, done once.
+## From MATLAB
 
-## What it does
+MATLAB R2022a or newer can call the package directly. Point it at a Python that has the package installed, once per session:
 
-- finds meters by serial number, with a stable `/dev/thorlabs-pm/<serial>` symlink from the udev rule
-- readings in watts with the standard deviation over *n* samples, and dBm
-- wavelength, averaging, manual or automatic range, the meter's dark-level zero, relative mode against a stored reference
-- every command checked against the instrument's error queue, so a bad setting fails where it happens
-- identity, sensor head, calibration date and responsivity from the instrument
-- `thorlabs-pm` command line: `list`, `read`, `watch`, `set`, `info`, all with `--json`
-- a simulator with the same interface for tests without a meter
+```matlab
+pyenv(Version="/usr/bin/python3");            % or the venv you installed into
+pm = py.thorlabs_pm.PowerMeter(pyargs('wavelength_nm', 532));
+r = pm.read(int32(10));
+watts = double(r{'watts'});
+pm.close();
+```
 
-Tested with a PM16-121. Other heads in the same SCPI family should work; reports welcome.
+`matlab/read_power.m` is a working script. Tested with R2026a.
 
-## Setup
+## Command line
 
-Copy `udev/60-thorlabs-pm.rules` to `/etc/udev/rules.d/`, `sudo udevadm control --reload-rules`,
-and add your user to the `plugdev` group. Plug the meter in; `thorlabs-pm list` shows it.
+| Command | Does |
+|---|---|
+| `thorlabs-pm list` | meters on the USB bus |
+| `thorlabs-pm read -n 10 --wavelength-nm 532` | one averaged reading |
+| `thorlabs-pm watch` | live readings until Ctrl-C (`--json` for logging) |
+| `thorlabs-pm set --auto-range on --zero on` | settings and the dark-level zero |
+| `thorlabs-pm info` | identity, sensor head, calibration date |
+| `thorlabs-pm-gui` | the app (`--sim` shows it with a simulated meter, no hardware) |
 
-## Roadmap
+## Troubleshooting
 
-The Linux replacement for the Optical Power Monitor window — live reading, statistics, chart,
-CSV logging — exists in the Wits OCLab rig software and will be made standalone here.
+* `no Thorlabs usbtmc device`: check `lsusb` shows `1313:`, that the udev rule is installed and you are in `plugdev`.
+* Readings stop after the meter sat idle: USB autosuspend. The udev rule turns it off for the meter; reload the rules and replug.
+* A wrong setting gives an error naming the SCPI command: the code checks the meter's error queue after every write.
+
+## License
+
+MIT. Copyright (c) 2026 Wits OC Lab. See LICENSE.
+
+## Acknowledgements
+
+Written for the OC Lab optical computing rig, where it replaced the Windows-only Optical Power Monitor.

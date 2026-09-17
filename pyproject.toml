@@ -20,9 +20,13 @@ dependencies = ["numpy>=1.24"]
 
 [project.scripts]
 thorlabs-pm = "thorlabs_pm.cli:main"
+thorlabs-pm-gui = "thorlabs_pm.gui.powermeter:main_direct"
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"thorlabs_pm" = ["data/*", "gui/*.css"]

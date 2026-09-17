@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Power Meter
+Comment=Thorlabs power meter: live reading, statistics, chart, CSV log
+Exec=thorlabs-pm-gui
+Icon=za.ac.wits.oclab.ThorlabsPowerMeter
+Terminal=false
+Categories=Science;
+StartupWMClass=za.ac.wits.oclab.ThorlabsPowerMeter

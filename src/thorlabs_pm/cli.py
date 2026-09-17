@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import pathlib
 import sys
 import time
 
@@ -38,11 +39,43 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--zero", choices=["on", "off"], help="on: store the present reading as the dark level")
     s = sub.add_parser("info", help="identity, sensor head, calibration date, current settings")
     s.add_argument("--serial")
+    sub.add_parser("desktop-install", help="put the Power Meter app in this user's application menu")
     return p
+
+
+def desktop_install() -> int:
+    """Copy the launcher and icon into the user's freedesktop directories and refresh the caches."""
+    import shutil
+    import subprocess
+    from importlib import resources
+    home = pathlib.Path.home()
+    apps = home / ".local/share/applications"
+    icons = home / ".local/share/icons/hicolor/scalable/apps"
+    apps.mkdir(parents=True, exist_ok=True)
+    icons.mkdir(parents=True, exist_ok=True)
+    data = resources.files("thorlabs_pm") / "data"
+    launcher = data / "za.ac.wits.oclab.ThorlabsPowerMeter.desktop"
+    text = launcher.read_text()
+    exe = shutil.which("thorlabs-pm-gui")
+    if exe:
+        text = text.replace("Exec=thorlabs-pm-gui", f"Exec={exe}")     # menus do not search a pipx PATH
+    (apps / launcher.name).write_text(text)
+    shutil.copy(str(data / "za.ac.wits.oclab.ThorlabsPowerMeter.svg"), icons)
+    index = home / ".local/share/icons/hicolor/index.theme"
+    if not index.exists():   # some icon loaders skip a theme directory without one
+        index.write_text("[Icon Theme]\nName=Hicolor\nComment=Fallback icon theme\nHidden=true\nDirectories=scalable/apps\n\n"
+                         "[scalable/apps]\nSize=128\nMinSize=16\nMaxSize=512\nContext=Applications\nType=Scalable\n")
+    for cmd in (["update-desktop-database", str(apps)], ["gtk4-update-icon-cache", "-f", "-t", str(index.parent)]):
+        if shutil.which(cmd[0]):
+            subprocess.run(cmd, capture_output=True)
+    print(f"installed {apps / launcher.name}; 'Power Meter' is in the application menu (log out and in if not)")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "desktop-install":
+        return desktop_install()
     if args.command == "list":
         found = find_usbtmc()
         if not found:

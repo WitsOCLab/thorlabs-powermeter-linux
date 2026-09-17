@@ -3,6 +3,7 @@ title: thorlabs-powermeter-linux
 message: If you use this software, please cite it.
 type: software
 authors:
-  - name: OCLab, School of Electrical and Information Engineering, University of the Witwatersrand
+  - name: Wits OC Lab
+    website: https://www.wits.ac.za/oclab
 repository-code: https://github.com/WitsOCLab/thorlabs-powermeter-linux
 license: MIT
