@@ -78,6 +78,10 @@ pm.close();
 * Readings stop after the meter sat idle: USB autosuspend. The udev rule turns it off for the meter; reload the rules and replug.
 * A wrong setting gives an error naming the SCPI command: the code checks the meter's error queue after every write.
 
+## Disclaimer
+
+Not affiliated with or endorsed by Thorlabs. "Thorlabs" and the product names are trademarks of Thorlabs, Inc., used here only to say which hardware this works with. The software talks to the meter with the SCPI commands in Thorlabs' own manuals over the standard USBTMC class; it contains no Thorlabs code. It is a laboratory tool, not a safety instrument: do not use its readings for laser safety decisions.
+
 ## License
 
 MIT. Copyright (c) 2026 Wits OC Lab. See LICENSE.
